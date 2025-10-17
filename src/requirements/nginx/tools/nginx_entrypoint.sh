@@ -30,31 +30,12 @@ generate_ssl_cert()
     echo "SSL Certification Generated!"
 }
 
-check_bonus_services()
-{
-    # Usar variable de entorno si está disponible
-    if [ "$MODE" = "bonus" ]; then
-        echo "Bonus mode detected via environment variable - using bonus configuration"
-        TEMPLATE_FILE="/nginx_bonus.cnf.template"
-    else
-        if nc -z -w5 adminer 8080 2>/dev/null; then
-            echo "Bonus services detected - using bonus configuration"
-            TEMPLATE_FILE="/nginx_bonus.cnf.template"
-        else
-            echo "Mandatory mode - using basic configuration"
-            TEMPLATE_FILE="/nginx.cnf.template"
-        fi
-    fi
-}
-
 start_templates()
 {
     echo "Applying templates configuration"
     
-    # Determinar qué configuración usar
-    check_bonus_services
+    TEMPLATE_FILE="/nginx.cnf.template"
     
-    # Aplicar la plantilla correcta
     envsubst '${NGINX_PORT} ${DOMAIN_NAME} ${SSL_PATH} ${NGINX_BDIR}' < "$TEMPLATE_FILE" > /etc/nginx/nginx.conf
     
     echo "Configuration Complete! Starting Nginx..."

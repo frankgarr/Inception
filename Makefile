@@ -9,7 +9,7 @@ COMPOSE = docker-compose
 # ╚══════════════════════════════════════════════════════════════════════════╝ # 
 
 MANDATORY_PATH = -f ./src/mandatory.yml
-BONUS_PATH = -f ./src/bonus.yml
+BONUS_PATH = -f ./src/bonus.yml # PARA BORRAR
 
 # ╔══════════════════════════════════════════════════════════════════════════╗ #  
 #                               COLORS                                         #

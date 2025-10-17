@@ -39,22 +39,6 @@ download_wpcli()
 	fi
 }
 
-download_redis()
-{
-	version=$1
-	volume_path=$2
-	
-	if [ ! -d $volume_path/wp-content/plugins/redis-cache ]; then
-	curl -L https://downloads.wordpress.org/plugin/redis-cache.$version.zip -o redis-cache.zip
-	unzip redis-cache.zip
-	rm redis-cache.zip
-	mv /redis-cache $volume_path/wp-content/plugins/
-	echo "Redis-cache plugin instaled!"
-		else
-	echo "Redis-cache plugin already instaled"
-	fi
-}
-
 add_group()
 {
 	group=$1
@@ -119,45 +103,8 @@ select_wp_config()
 {
     volume_path=$1
 
-    if [ "$MODE" = "bonus" ]; then
-        echo "Bonus mode detected via environment variable - using Redis configuration"
-        cp /wp-config-bonus.php $volume_path/wp-config.php
-        download_redis "2.5.0" "$volume_path"
-    else
-        # Verificación de red como fallback
-        if nc -z -w2 redis 6379 2>/dev/null; then
-            echo "Bonus mode detected - using Redis configuration"
-            cp /wp-config-bonus.php $volume_path/wp-config.php
-            download_redis "2.5.0" "$volume_path"
-        else
-            echo "Mandatory mode detected - using basic configuration"
-            cp /wp-config-mandatory.php $volume_path/wp-config.php
-            rm -f $volume_path/wp-content/object-cache.php 2>/dev/null || true
-        fi
-    fi    
-}
-
-configure_redis_if_available()
-{
-    volume_path=$1
-    php_version=$2
-
-    if [ "$MODE" = "bonus" ]; then
-        echo "Configuring Redis cache (bonus mode)..."
-        WP="/usr/bin/php${php_version} -d memory_limit=256M /usr/local/bin/wp --path=$volume_path"
-        $WP plugin activate redis-cache --allow-root
-        $WP redis enable --allow-root
-        echo "Redis cache configured successfully!"
-    else
-        # Verificación de red como fallback
-        if nc -z -w2 redis 6379 2>/dev/null; then
-            echo "Configuring Redis cache..."
-            WP="/usr/bin/php${php_version} -d memory_limit=256M /usr/local/bin/wp --path=$volume_path"
-            $WP plugin activate redis-cache --allow-root
-            $WP redis enable --allow-root
-            echo "Redis cache configured successfully!"
-        fi
-    fi
+    cp /wp-config-mandatory.php $volume_path/wp-config.php
+    rm -f $volume_path/wp-content/object-cache.php 2>/dev/null || true    
 }
 
 init_wp()
@@ -170,7 +117,6 @@ init_wp()
     select_wp_config "$volume"
     conf_php    "${PHP_VERSION}"
     conf_wp     "${PHP_VERSION}" "$volume"
-    configure_redis_if_available "$volume" "${PHP_VERSION}"
     exec php-fpm${PHP_VERSION} -F
 }
 

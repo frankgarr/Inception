@@ -37,7 +37,6 @@ services:
       - DOMAIN_NAME
       - NGINX_BDIR
       - SSL_PATH
-      - MODE=${MODE}
     ports:
       - "${NGINX_PORT}:${NGINX_PORT}"
     volumes:
@@ -76,7 +75,6 @@ services:
       - WP_VERSION
       - DOMAIN_NAME
       - PHP_VERSION
-      - MODE=${MODE}
     expose:
       - "${WORDPRESS_PORT}"
     volumes:

@@ -25,7 +25,6 @@ RUN	apk update && \
 		php${PHP_VERSION}-zlib
 
 COPY    --chmod=644 ${WP_CONF}wp-config-mandatory.php /
-COPY    --chmod=644 ${WP_CONF}wp-config-bonus.php /
 COPY    --chmod=755 ${WP_SCRIPT}wp_entrypoint.sh /entrypoint.sh
 
 ENTRYPOINT ["/entrypoint.sh"]
